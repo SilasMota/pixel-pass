@@ -1,11 +1,8 @@
 import PasswordInput from '../components/PasswordInput'
 import ImageUploader from '../components/ImageUploader'
 import { AES } from 'crypto-js'
-
-import {
-  ArrowRightStartOnRectangleIcon,
-  LockClosedIcon,
-} from '@heroicons/react/24/solid'
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
+import { ArrowRightStartOnRectangleIcon, LockClosedIcon } from '@heroicons/react/24/solid'
 import { useEffect, useRef, useState } from 'react'
 import { saveAs } from 'file-saver'
 
@@ -27,6 +24,8 @@ export default function EncodePage({ passKey }) {
   const [canvas, setCanvas] = useState()
   const [encodedImage, setEncodedImage] = useState(null)
   const [name, setName] = useState(null)
+  const [encodeReady, setEncodeReady] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
   const image = new Image()
 
   function handleFileUpload(event) {
@@ -52,6 +51,11 @@ export default function EncodePage({ passKey }) {
   // -------- ENCODING ----------
   const encodeText = () => {
     // Validation of text to be encoded
+
+    if (!image.src) {
+      return
+    }
+
     const info = formLayout
 
     let text = JSON.stringify(info)
@@ -86,6 +90,9 @@ export default function EncodePage({ passKey }) {
     // Outputing the image
     ctx.putImageData(imgData, 0, 0)
     setEncodedImage(canvas.toDataURL())
+
+    setEncodeReady(true)
+    setModalOpen(true)
   }
 
   const downloadImage = () => {
@@ -97,7 +104,45 @@ export default function EncodePage({ passKey }) {
   }
 
   return (
-    <div className="flex min-h-full flex-1 flex-col px-6 py-6 lg:px-6">
+    <div className="relative flex min-h-full flex-1 flex-col px-6 py-6 lg:px-6">
+      <Dialog open={modalOpen} onClose={setModalOpen} className="relative z-10">
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+        />
+
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <DialogPanel
+              transition
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
+            >
+              <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                    <DialogTitle as="h3" className="text-base font-semibold text-gray-900">
+                      Credentials encoded successfully!
+                    </DialogTitle>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">The image can now be exported</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+                >
+                  OK
+                </button>
+              </div>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
+
       <canvas ref={canvasRef} style={{ display: 'none' }} />
       <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
         <h1 className=" text-gray-50 items-center text-center text-lg mb-10 font-medium">
@@ -167,13 +212,15 @@ export default function EncodePage({ passKey }) {
               <PhotoIcon className=" h-3 w-3" />
             </button> */}
 
-            <button
-              className="flex space-x-2 w-full justify-center items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              onClick={downloadImage}
-            >
-              <span>Export</span>
-              <ArrowRightStartOnRectangleIcon className=" h-3 w-3" />
-            </button>
+            {encodeReady && (
+              <button
+                className="flex space-x-2 w-full justify-center items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                onClick={downloadImage}
+              >
+                <span>Export</span>
+                <ArrowRightStartOnRectangleIcon className=" h-3 w-3" />
+              </button>
+            )}
           </div>
         </form>
       </div>

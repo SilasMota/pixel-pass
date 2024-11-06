@@ -12,6 +12,7 @@ export default function PasswordInput({ label, formLayout, setFormLayout, canSug
   function onInputChange(e) {
     formLayout.find((obj) => obj.label == label).value = e.target.value
     setFormLayout(formLayout)
+    setSugestedPassword(e.target.value)
   }
 
   const sugestPassword = (label) => {
