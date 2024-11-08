@@ -26,9 +26,10 @@ export default function EncodePage({ passKey }) {
   const [name, setName] = useState(null)
   const [encodeReady, setEncodeReady] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
-  const image = new Image()
+  const [image] = useState(new Image())
 
   function handleFileUpload(event) {
+    setEncodeReady(false)
     const reader = new FileReader()
     reader.onload = function (e) {
       image.src = e.target.result
@@ -52,6 +53,7 @@ export default function EncodePage({ passKey }) {
   const encodeText = () => {
     // Validation of text to be encoded
 
+    // console.log(image.src)
     if (!image.src) {
       return
     }
@@ -61,7 +63,10 @@ export default function EncodePage({ passKey }) {
     let text = JSON.stringify(info)
 
     //Encrypting object with passKey
+    // console.log(text)
+    // console.log(passKey)
     text = AES.encrypt(text, passKey).toString()
+    // console.log(text)
     // Extracting image data
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
     const data = imgData.data
@@ -79,9 +84,11 @@ export default function EncodePage({ passKey }) {
     // Validating if the image is long enough to encode the message
     if (binaryText.length > data.length / 4) {
       alert('Text is too long to encode in this image.')
+      console.log('Text is too long to encode in this image.')
       return
     }
 
+    // console.log(binaryText)
     // Loop through image bytes replacing LSB with bites on the binary text
     for (let i = 0; i < binaryText.length; i++) {
       data[i * 4] = (data[i * 4] & 0b11111110) | parseInt(binaryText[i])
@@ -96,7 +103,7 @@ export default function EncodePage({ passKey }) {
   }
 
   const downloadImage = () => {
-    saveAs(encodedImage, name ? name : 'image.jpg')
+    saveAs(encodedImage, name ? name + ".jpg" : 'image.jpg')
   }
 
   const fnHandleSubmit = (event) => {
@@ -158,6 +165,8 @@ export default function EncodePage({ passKey }) {
             </label>
             <input
               type="text"
+              title="Letters and numbers only"
+              pattern="[a-zA-Z0-9,-,_]+"
               placeholder="Name"
               className=" p-4 block bg-slate-700 w-full rounded-md border-0 py-1.5 text-gray-200 shadow-sm ring-1 ring-inset ring-gray-400 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               onChange={(e) => setName(e.target.value)}

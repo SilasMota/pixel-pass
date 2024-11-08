@@ -29,14 +29,14 @@ export default function ImageUploader({ handleFileUpload }) {
               id="file-upload"
               name="file-upload"
               type="file"
-              accept="image/*"
+              accept=".gif, .jpg"
               className="sr-only"
               onChange={handleChange}
             />
           </label>
-          <p className="pl-1 text-gray-100">or drag and drop</p>
+          {/* <p className="pl-1 text-gray-100">or drag and drop</p> */}
         </div>
-        <p className="text-xs leading-5 text-gray-100">PNG, JPG, GIF up to 10MB</p>
+        <p className="text-xs leading-5 text-gray-100">JPG or GIF</p>
       </div>
     </div>
   )

@@ -53,26 +53,45 @@ export default function DecodePage({ passKey }) {
     const data = imgData.data
     let binaryText = ''
     let decodedText = ''
+    // let decodedBinary = ''
 
     // Looping through image bytes to get the binary text for the message
     for (let i = 0; i < data.length; i += 4) {
       binaryText += (data[i] & 1).toString()
     }
+
+    
+    // console.log(binaryText)
+
     // Parsing the binary text to string
     for (let i = 0; i < binaryText.length; i += 8) {
       let byte = binaryText.slice(i, i + 8)
-      if (byte.length < 8) break // Stop if the byte is incomplete
+      if (byte.length < 8) {
+        console.log("byte is incomplete")
+        break 
+      }// Stop if the byte is incomplete
       let charCode = parseInt(byte, 2)
-      if (charCode === 0) break // Stop if we hit a null character
+      if (charCode === 0){
+        console.log("we hit a null character")
+        break // Stop if we hit a null character
+      }
+      // decodedBinary += byte
       decodedText += String.fromCharCode(charCode)
     }
+    // decodedBinary += "00000000"
+    // console.log(decodedText)
+    // console.log(decodedBinary)
+    
 
     // Outputting the decoded message
     try {
       //Decrypting object with passKey
+      // console.log(AES.decrypt(decodedText, passKey).toString(enc.Utf16))
       decodedText = AES.decrypt(decodedText, passKey).toString(enc.Utf8)
+      // console.log(decodedText)
       setFormLayout(JSON.parse(decodedText))
     } catch (error) {
+      // console.log(error)
       setFormLayout([
         {
           label: 'User',
