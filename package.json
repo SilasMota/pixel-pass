@@ -1,6 +1,6 @@
 {
   "name": "pixel-pass",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "An Electron application with React",
   "main": "./out/main/index.js",
   "author": "example.com",
