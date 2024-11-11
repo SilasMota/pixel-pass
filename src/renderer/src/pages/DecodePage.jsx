@@ -4,25 +4,16 @@ import { DocumentDuplicateIcon, LockOpenIcon } from '@heroicons/react/24/solid'
 import { useEffect, useRef, useState } from 'react'
 import { AES, enc } from 'crypto-js'
 
+
 // eslint-disable-next-line react/prop-types
 export default function DecodePage({ passKey }) {
   // eslint-disable-next-line no-unused-vars
-  const [formLayout, setFormLayout] = useState([
-    {
-      label: 'User',
-      value: null
-    },
-    {
-      label: 'Password',
-      value: null
-    }
-  ])
+  const [formLayout, setFormLayout] = useState([])
 
   const canvasRef = useRef(null)
   const [ctx, setCtx] = useState()
   const [canvas, setCanvas] = useState()
-
-  const image = new Image()
+  const [image] = useState(new Image())
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -32,6 +23,11 @@ export default function DecodePage({ passKey }) {
   }, [ctx])
 
   function handleFileUpload(event) {
+    const file = event.target.files[0]
+    if (!file) {
+      setFormLayout([])
+      return
+    }
     const reader = new FileReader()
     reader.onload = function (e) {
       image.src = e.target.result
@@ -39,9 +35,10 @@ export default function DecodePage({ passKey }) {
         canvas.width = image.width
         canvas.height = image.height
         ctx.drawImage(image, 0, 0)
+        decodeText()
       }
     }
-    reader.readAsDataURL(event.target.files[0])
+    reader.readAsDataURL(file)
   }
 
   const fnHandleSubmit = (event) => {
@@ -54,54 +51,33 @@ export default function DecodePage({ passKey }) {
     let binaryText = ''
     let decodedText = ''
     // let decodedBinary = ''
-
     // Looping through image bytes to get the binary text for the message
     for (let i = 0; i < data.length; i += 4) {
       binaryText += (data[i] & 1).toString()
     }
 
-    
-    // console.log(binaryText)
-
     // Parsing the binary text to string
     for (let i = 0; i < binaryText.length; i += 8) {
       let byte = binaryText.slice(i, i + 8)
       if (byte.length < 8) {
-        console.log("byte is incomplete")
-        break 
-      }// Stop if the byte is incomplete
+        console.log('byte is incomplete')
+        break
+      } // Stop if the byte is incomplete
       let charCode = parseInt(byte, 2)
-      if (charCode === 0){
-        console.log("we hit a null character")
+      if (charCode === 0) {
         break // Stop if we hit a null character
       }
-      // decodedBinary += byte
       decodedText += String.fromCharCode(charCode)
     }
-    // decodedBinary += "00000000"
-    // console.log(decodedText)
-    // console.log(decodedBinary)
-    
 
     // Outputting the decoded message
     try {
       //Decrypting object with passKey
-      // console.log(AES.decrypt(decodedText, passKey).toString(enc.Utf16))
       decodedText = AES.decrypt(decodedText, passKey).toString(enc.Utf8)
-      // console.log(decodedText)
       setFormLayout(JSON.parse(decodedText))
     } catch (error) {
-      // console.log(error)
-      setFormLayout([
-        {
-          label: 'User',
-          value: null
-        },
-        {
-          label: 'Password',
-          value: null
-        }
-      ])
+      console.log(error)
+      setFormLayout([])
     }
   }
   return (
@@ -148,6 +124,7 @@ export default function DecodePage({ passKey }) {
                   <button
                     className="flex justify-center items-center bg-slate-700 rounded-md  px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 hover:border-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     onClick={() => navigator.clipboard.writeText(field.value)}
+                    title='Copy to clipboard'
                   >
                     <DocumentDuplicateIcon className="w-5 h-5" />
                   </button>

@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: com.silasmota.pixelpass
 productName: pixel-pass
 directories:
   buildResources: build

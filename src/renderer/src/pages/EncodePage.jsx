@@ -53,7 +53,6 @@ export default function EncodePage({ passKey }) {
   const encodeText = () => {
     // Validation of text to be encoded
 
-    // console.log(image.src)
     if (!image.src) {
       return
     }
@@ -63,10 +62,7 @@ export default function EncodePage({ passKey }) {
     let text = JSON.stringify(info)
 
     //Encrypting object with passKey
-    // console.log(text)
-    // console.log(passKey)
     text = AES.encrypt(text, passKey).toString()
-    // console.log(text)
     // Extracting image data
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
     const data = imgData.data
@@ -88,7 +84,6 @@ export default function EncodePage({ passKey }) {
       return
     }
 
-    // console.log(binaryText)
     // Loop through image bytes replacing LSB with bites on the binary text
     for (let i = 0; i < binaryText.length; i++) {
       data[i * 4] = (data[i * 4] & 0b11111110) | parseInt(binaryText[i])
@@ -166,8 +161,9 @@ export default function EncodePage({ passKey }) {
             <input
               type="text"
               title="Letters and numbers only"
-              pattern="[a-zA-Z0-9,-,_]+"
+              // pattern="[a-zA-Z0-9,-,_]+"
               placeholder="Name"
+              name="file-name"
               className=" p-4 block bg-slate-700 w-full rounded-md border-0 py-1.5 text-gray-200 shadow-sm ring-1 ring-inset ring-gray-400 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               onChange={(e) => setName(e.target.value)}
               value={name}

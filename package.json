@@ -1,10 +1,10 @@
 {
   "name": "pixel-pass",
-  "version": "0.1.0",
-  "description": "An Electron application with React",
+  "version": "0.1.1",
+  "description": "Password manager that uses steganography to encrypt passwords in images",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "silasmota.com",
+  "homepage": "https://github.com/SilasMota/pixel-pass",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
